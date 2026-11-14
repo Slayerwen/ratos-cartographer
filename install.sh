@@ -22,7 +22,7 @@ PLUGIN_MISSING=0
 if ! "${HOME}/klippy-env/bin/python" -c "import cartographer" 2>/dev/null; then
 	PLUGIN_MISSING=1
 	echo "NOTE: Cartographer Klipper plugin not installed yet. That is fine: install it after the"
-	echo "      RatOS Setup Wizard (see GUIDE.md). Klipper shows an error about [cartographer] until then."
+	echo "      RatOS Setup Wizard (see the install guide in README.md). Klipper shows an error about [cartographer] until then."
 fi
 
 echo "==> Linking optional Klipper extra trsync_timeout.py (off unless [trsync_timeout] is in printer.cfg)"
@@ -90,7 +90,7 @@ sleep 1
 echo
 if [ -e /dev/cartographer ]; then echo "/dev/cartographer -> $(readlink -f /dev/cartographer)"; else echo "NOTE: /dev/cartographer not present (Cartographer not on USB?)"; fi
 echo
-echo "Done. Next steps (see GUIDE.md):"
+echo "Done. Next steps (install guide: https://github.com/Slayerwen/ratos-cartographer):"
 echo " 1. RatOS Setup Wizard: choose 'Cartographer 3D' as Z probe and save."
 if [ "${PLUGIN_MISSING}" -eq 1 ]; then
 	echo " 2. Install the Cartographer (hardware, firmware, Klipper plugin): https://docs.cartographer3d.com"
