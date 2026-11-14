@@ -113,7 +113,7 @@ print.
 
 ### ➕ Paste these
 
-Paste below `[include RatOS.cfg]` and above the `#*# SAVE_CONFIG` line.
+Paste in printer.cfg
 
 1. **Prime blob height.** Raises the nozzle while priming, so it doesn't get buried in plastic:
    ```ini
