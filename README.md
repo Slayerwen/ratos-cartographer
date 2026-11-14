@@ -72,74 +72,55 @@ A line saying the Cartographer plugin is not installed yet is OK.
 
 ✅ **Done when:** the configuration is saved.
 
-ℹ️ Klipper will now show an error about Cartographer. **That is expected.** It goes away after step 5.
+ℹ️ Klipper will now show an error about Cartographer. **That is expected.** It goes away during step 4.
 
-## Step 4 — Install the Cartographer
+## Step 4 — Install and calibrate the Cartographer
 
-**Where:** Cartographer website.
+**Where:** Cartographer website. Start here and follow their pages in order, up to and including
+**Touch Calibration**:
+<https://docs.cartographer3d.com/cartographer-probe/installation-and-setup/probe-installation/>
 
-1. Mount and connect the probe:
-   <https://docs.cartographer3d.com/cartographer-probe/installation-and-setup/probe-installation/>
-2. Open the Klipper setup page:
-   <https://docs.cartographer3d.com/cartographer-probe/installation-and-setup/software-configuration/klipper-setup/>
+Follow their guide as written, **with these exceptions**:
 
-   On that page, **only do these parts**:
+| In Cartographer's guide | What to do on RatOS |
+|---|---|
+| `[safe_z_home]` and `[homing_override]` | ❌ **Do not add them.** They break RatOS homing. |
+| Where to put the config sections | In `printer.cfg`, **below** `[include RatOS.cfg]` and **above** the `#*# SAVE_CONFIG` line. |
+| `zero_reference_position` in `[bed_mesh]` | Must be the **middle of your bed** (e.g. `250, 250` for a 500 bed). The nozzle touches the bed there during every print. |
+| CAN | Keep `canbus_uuid` and **delete** the `serial` and `restart_method` lines, as their page says. Otherwise Klipper won't start. |
+| `CARTOGRAPHER_TOUCH_HOME` in your start G-code | ❌ Not needed. RatOS's START_PRINT does it for you. |
 
-   | Part on Cartographer's page | Do it? |
-   |---|---|
-   | Install the Klipper plugin | ✅ Yes |
-   | Download the firmware | ✅ Yes |
-   | Add the update sections to `moonraker.conf` | ✅ Yes |
-   | Find your serial path / CAN UUID | ✅ Yes, write it down |
-   | Update the probe firmware | ✅ Yes |
-   | `[safe_z_home]` and `[homing_override]` | ❌ **No!** They break RatOS homing |
-   | All other config sections for `printer.cfg` | ❌ No, step 5 does it |
-   | Calibration | ⏭ Later, in step 6 |
+✅ **Done when:** you finished their **Touch Calibration** page and ran `SAVE_CONFIG`, and typing
+`CARTOGRAPHER_RATOS_STATUS` in the Mainsail console shows your offsets plus a **scan model** and
+**touch model** that are not `none`.
 
-✅ **Done when:** the plugin and firmware are installed.
-
-## Step 5 — Add your settings to printer.cfg
+## Step 5 — Paste the RatOS settings into printer.cfg
 
 **Where:** Mainsail → **Machine** (left menu) → click `printer.cfg`.
+Paste below `[include RatOS.cfg]` and above the `#*# SAVE_CONFIG` line.
 
-1. Scroll down to the bottom, **just above** the line that starts with `#*# <---------------------- SAVE_CONFIG`.
-   If there is no such line, go to the very end.
-2. Paste this, and change the numbers to yours:
+1. **Prime blob height.** Raises the nozzle while priming, so it doesn't get buried in plastic:
    ```ini
-   [cartographer]
-   x_offset: 0      # your probe X offset (from Cartographer's docs / your toolhead mount)
-   y_offset: 20     # your probe Y offset
-
-   [bed_mesh]
-   zero_reference_position: 250, 250   # the middle of your bed: 150,150 (300 bed), 200,200 (400 bed), 250,250 (500 bed)
+   [gcode_macro RatOS]
+   variable_prime_blob_z: 1.5
    ```
-3. **Only if you use CAN**, also paste this with your UUID from step 4:
+2. **Accelerometer.** Cartographer's guide added it as `[adxl345]`. RatOS Realtime Analysis can only
+   show it under the name "Control Board", so **rename** these two lines from step 4:
    ```ini
-   [mcu cartographer]
-   canbus_uuid: 0123456789ab
+   [adxl345 controlboard]       # was: [adxl345]
+   cs_pin: cartographer:PA0     # V4. For V3: cartographer:PA3
+   spi_bus: spi1
+
+   [resonance_tester]
+   accel_chip: adxl345 controlboard   # was: adxl345
    ```
-4. Click **Save & Restart** (top right).
+   ⚠️ Skip this if you have another accelerometer plugged into your control board.
+3. Click **Save & Restart**.
 
-✅ **Done when:** Mainsail shows no error and the printer status is **Ready**.
+✅ **Done when:** the printer is **Ready**, and in the Configurator → **Realtime Analysis** →
+**Stream → Accelerometer → Control Board** shows a live graph.
 
-## Step 6 — Calibrate the Cartographer
-
-**Where:** Mainsail → **Dashboard** → **Console** (type commands at the bottom and press Enter).
-
-Make sure the nozzle is clean and **not hotter than 150 °C**.
-
-1. Type `G28` and press Enter. The printer homes.
-2. Type `CARTOGRAPHER_SCAN_CALIBRATE` and press Enter.
-   A window opens: lower the nozzle until a sheet of paper just drags, then click **Accept**.
-   [More help](https://docs.cartographer3d.com/cartographer-probe/installation-and-setup/software-configuration/scan-calibration/)
-3. Type `CARTOGRAPHER_TOUCH_CALIBRATE` and press Enter. The nozzle gently touches the bed a few times.
-   [More help](https://docs.cartographer3d.com/cartographer-probe/installation-and-setup/software-configuration/touch-calibration/)
-4. Type `SAVE_CONFIG` and press Enter. Klipper restarts.
-5. Type `CARTOGRAPHER_RATOS_STATUS` and press Enter.
-
-✅ **Done when:** the status shows your offsets, and a **scan model** and **touch model** that are not `none`.
-
-## Step 7 — Print
+## Step 6 — Print
 
 1. Slice with your normal RatOS slicer profile: <https://os.ratrig.com/docs/slicers>
    Do **not** add `CARTOGRAPHER_TOUCH_HOME` to the start G-code, because RatOS does it for you.
@@ -149,52 +130,25 @@ Make sure the nozzle is clean and **not hotter than 150 °C**.
 
 ✅ **Done!** 🎉
 
----
-
-## Optional extras
-
-**The prime blob buries the nozzle in plastic.** Add this to printer.cfg to raise it:
-
-```ini
-[gcode_macro RatOS]
-variable_prime_blob_z: 1.5
-```
-
-**Use the Cartographer V4's accelerometer** for input shaper and Realtime Analysis
-(only if no other accelerometer is plugged into your control board):
-
-```ini
-[adxl345 controlboard]
-cs_pin: cartographer:PA0   # V4. For V3 use: cartographer:PA3
-spi_bus: spi1
-
-[resonance_tester]
-accel_chip: adxl345 controlboard
-probe_points:
-    250, 250, 20           # middle of your bed
-```
-
-In Realtime Analysis, choose **Stream → Accelerometer → Control Board**.
-
 ## Already have RatOS set up and printing?
 
 1. Do **step 2**.
 2. In the Configurator, set **Probe** to **Cartographer 3D** and click **Confirm and save**.
    For `printer.cfg`, click **Review changes** → **Keep existing file**.
-3. If the Cartographer is not installed yet, do **step 4**.
-4. In `printer.cfg`, delete anything you added before to make Cartographer work:
-   `[safe_z_home]`, `[homing_override]`, `[probe]`, `[temperature_sensor cartographer]`,
-   and your own `PROBE_FOR_PRIMING`, `PRIME_BLOB` or `_USER_START_PRINT_BED_MESH` macros.
-   Keep `[cartographer]`, `[bed_mesh]` and everything below `SAVE_CONFIG`.
-5. Do **step 5** for anything that is missing, then **step 6** if you are not calibrated yet.
+3. If the Cartographer is not installed and calibrated yet, do **step 4**.
+4. In `printer.cfg`, delete what you added yourself to make Cartographer work with RatOS:
+   `[safe_z_home]`, `[homing_override]`, `[probe]`, and your own `PROBE_FOR_PRIMING`, `PRIME_BLOB`
+   or `_USER_START_PRINT_BED_MESH` macros. Also remove `CARTOGRAPHER_TOUCH_HOME` from your slicer's
+   start G-code. Keep the Cartographer sections from their guide and everything below `SAVE_CONFIG`.
+5. Click **Save & Restart**, run `CARTOGRAPHER_RATOS_STATUS` in the console, then do **step 5** and **step 6**.
 
 ## Problems?
 
 | Problem | What to do |
 |---|---|
 | Cartographer 3D is not in the Probe list | Do step 2, then reload the Configurator page. |
-| Klipper error right after step 3 | Normal, continue with steps 4 and 5. |
-| Klipper still won't start after step 5 | In the terminal, run `python3 ~/ratos-cartographer/build.py`, then click **Restart** in Mainsail. |
+| Klipper error right after step 3 | Normal, continue with step 4. |
+| Klipper still won't start after step 4 | Check that `[safe_z_home]` / `[homing_override]` are not in printer.cfg, and with CAN that `serial` / `restart_method` are removed. Then in the terminal run `python3 ~/ratos-cartographer/build.py` and click **Restart** in Mainsail. |
 | `Nozzle temperature must be below 150C` | Let the nozzle cool down, or add `variable_cartographer_touch_true_zero_temp: 145` under `[gcode_macro RatOS]` in printer.cfg. |
 | `Communication timeout during homing` | See below. |
 | Something else | Open an issue on GitHub with the error, the output of `CARTOGRAPHER_RATOS_STATUS` and your `klippy.log`. |

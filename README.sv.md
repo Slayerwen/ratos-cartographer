@@ -25,11 +25,13 @@ Följ **steg-för-steg-guiden** i [README.md](README.md#install-guide) (på enge
    bash ~/ratos-cartographer/install.sh
    ```
 3. Gör klart Setup Wizard och välj **Probe → Cartographer 3D**.
-4. Installera Cartographer enligt deras guide, men lägg **inte** till `[safe_z_home]` eller
-   `[homing_override]`.
-5. Lägg in dina offsets och `zero_reference_position` (bäddens mitt) i printer.cfg.
-6. Kalibrera: `G28`, `CARTOGRAPHER_SCAN_CALIBRATE`, `CARTOGRAPHER_TOUCH_CALIBRATE`, `SAVE_CONFIG`.
-7. Skriv ut med din vanliga RatOS-slicerprofil.
+4. Installera och kalibrera Cartographer enligt deras guide, men lägg **inte** till `[safe_z_home]`
+   eller `[homing_override]`. `zero_reference_position` ska vara bäddens mitt. Med CAN tar du bort
+   `serial` och `restart_method`. Kontrollera sedan med `CARTOGRAPHER_RATOS_STATUS`.
+5. Klistra in RatOS-inställningarna i printer.cfg: `variable_prime_blob_z: 1.5` under
+   `[gcode_macro RatOS]`, och döp om `[adxl345]` till `[adxl345 controlboard]` (och
+   `accel_chip: adxl345 controlboard`) så att accelerometern syns i Realtime Analysis.
+6. Skriv ut med din vanliga RatOS-slicerprofil.
 
 Problem eller frågor: se avsnittet **Problems?** i [README.md](README.md#problems), eller skapa en
 issue här på GitHub.
