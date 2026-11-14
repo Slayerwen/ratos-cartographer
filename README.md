@@ -80,23 +80,39 @@ A line saying the Cartographer plugin is not installed yet is OK.
 **Touch Calibration**:
 <https://docs.cartographer3d.com/cartographer-probe/installation-and-setup/probe-installation/>
 
-Follow their guide as written, **with these exceptions**:
+Follow their guide as written. Put their config sections in `printer.cfg`, **below**
+`[include RatOS.cfg]` and **above** the `#*# SAVE_CONFIG` line.
 
-| In Cartographer's guide | What to do on RatOS |
-|---|---|
-| `[safe_z_home]` and `[homing_override]` | ❌ **Do not add them.** They break RatOS homing. |
-| Where to put the config sections | In `printer.cfg`, **below** `[include RatOS.cfg]` and **above** the `#*# SAVE_CONFIG` line. |
-| `zero_reference_position` in `[bed_mesh]` | Must be the **middle of your bed** (e.g. `250, 250` for a 500 bed). The nozzle touches the bed there during every print. |
-| CAN | Keep `canbus_uuid` and **delete** the `serial` and `restart_method` lines, as their page says. Otherwise Klipper won't start. |
-| `CARTOGRAPHER_TOUCH_HOME` in your start G-code | ❌ Not needed. RatOS's START_PRINT does it for you. |
+⚠️ **Do not add `[safe_z_home]` or `[homing_override]`** from their guide. RatOS has its own homing,
+and Klipper won't start with them. Step 5 has the full list of what to leave out.
 
 ✅ **Done when:** you finished their **Touch Calibration** page and ran `SAVE_CONFIG`, and typing
 `CARTOGRAPHER_RATOS_STATUS` in the Mainsail console shows your offsets plus a **scan model** and
 **touch model** that are not `none`.
 
-## Step 5 — Paste the RatOS settings into printer.cfg
+## Step 5 — Check printer.cfg
 
 **Where:** Mainsail → **Machine** (left menu) → click `printer.cfg`.
+
+### ❌ Remove these if they are in printer.cfg
+
+| From Cartographer's guide | Why |
+|---|---|
+| `[safe_z_home]` | RatOS has its own homing. |
+| `[homing_override]` | RatOS has its own homing. |
+| **CAN only:** the `serial:` and `restart_method:` lines under `[mcu cartographer]` | Klipper won't start with them when `canbus_uuid` is used. |
+
+Also do **not** put `CARTOGRAPHER_TOUCH_HOME` in your slicer's start G-code. RatOS's START_PRINT
+already does it.
+
+### ✔️ Check this value
+
+In `[bed_mesh]`, `zero_reference_position` must be the **middle of your bed**, for example
+`250, 250` for a 500 bed or `150, 150` for a 300 bed. The nozzle touches the bed there before every
+print.
+
+### ➕ Paste these
+
 Paste below `[include RatOS.cfg]` and above the `#*# SAVE_CONFIG` line.
 
 1. **Prime blob height.** Raises the nozzle while priming, so it doesn't get buried in plastic:
@@ -117,7 +133,7 @@ Paste below `[include RatOS.cfg]` and above the `#*# SAVE_CONFIG` line.
    ⚠️ Skip this if you have another accelerometer plugged into your control board.
 3. Click **Save & Restart**.
 
-✅ **Done when:** the printer is **Ready**, and in the Configurator → **Realtime Analysis** →
+✅ **Done when:** Mainsail shows no error, the printer is **Ready**, and in the Configurator → **Realtime Analysis** →
 **Stream → Accelerometer → Control Board** shows a live graph.
 
 ## Step 6 — Print
