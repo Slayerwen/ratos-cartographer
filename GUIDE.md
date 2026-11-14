@@ -109,6 +109,23 @@ More settings and how the package works: see the [README](README.md).
 |---|---|
 | Cartographer 3D not in the Setup Wizard | Do step 2, then reload the Configurator page. |
 | Klipper won't start after the Setup Wizard saved | Run `python3 ~/ratos-cartographer/build.py`, then restart Klipper. |
-| `Communication timeout during homing` | Run `bash ~/ratos-cartographer/install.sh` again. |
+| `Communication timeout during homing` | See [the section below](#communication-timeout-during-homing). |
 | `Nozzle temperature must be below 150C` | Add `variable_cartographer_touch_true_zero_temp: 145` under `[gcode_macro RatOS]`. |
 | Something else | Open an issue on GitHub with the error, the output of `CARTOGRAPHER_RATOS_STATUS` and your `klippy.log`. |
+
+## Communication timeout during homing
+
+This happens when the printer's computer is too slow at that moment while the Cartographer and the
+control board must stay in sync.
+
+1. **Check the power first.** Run `vcgencmd get_throttled`. It must say `throttled=0x0`. Anything else
+   means under-voltage or throttling. Use a proper power supply, for example the official Raspberry Pi
+   one, with a short cable. Under-voltage can also make USB devices disconnect mid-print.
+2. **If the error still happens**, give Klipper more time by adding this to printer.cfg:
+
+   ```ini
+   [trsync_timeout]
+   timeout: 0.05
+   ```
+
+   This raises Klipper's sync window from 25 to 50 ms, without changing Klipper itself.

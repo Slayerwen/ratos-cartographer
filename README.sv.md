@@ -14,9 +14,9 @@ inte. Ingenting i RatOS eller Klipper ändras, så deras uppdateringar fungerar 
 - **Adaptiv priming fungerar.** RatOS mäter bädden där blobben läggs (tidigare stoppade det med
   "No probe, beacon or bltouch section found"). Blob-höjden går att ställa in.
 - **Live-accelerometer** på RatOS Analysis-sida för Cartographer V4 (se nedan).
-- **Lösning på "Communication timeout during homing"** på långsamma datorer (Raspberry Pi 3):
-  Klippers synkfönster mellan korten höjs från 25 till 50 ms med en liten tilläggsmodul, utan att
-  Klipper ändras.
+- **Valfri lösning på "Communication timeout during homing"**: en liten tilläggsmodul som höjer
+  Klippers synkfönster mellan korten från 25 till 50 ms, utan att Klipper ändras. Den är avstängd
+  från början. Kontrollera underspänning först (se [guiden](GUIDE.md#communication-timeout-during-homing)).
 - `CARTOGRAPHER_RATOS_STATUS` visar offsets, modeller och inställningar.
 
 ## Stöds

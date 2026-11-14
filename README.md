@@ -14,8 +14,9 @@ changed. Nothing in RatOS or Klipper is modified, so their updates keep working.
 - **Adaptive priming works.** RatOS measures the bed at the prime blob location (it stopped with
   "No probe, beacon or bltouch section found" before). The blob height is configurable.
 - **Live accelerometer** on the RatOS Analysis page for Cartographer V4 (see below).
-- **Fix for "Communication timeout during homing"** on slow hosts (Raspberry Pi 3): Klipper's
-  multi-MCU sync window is raised from 25 to 50 ms by a small Klipper extra, without editing Klipper.
+- **Optional fix for "Communication timeout during homing"**: a small Klipper extra that raises the
+  multi-MCU sync window from 25 to 50 ms without editing Klipper. It is off by default; check for
+  under-voltage first (see the [guide](GUIDE.md#communication-timeout-during-homing)).
 - `CARTOGRAPHER_RATOS_STATUS` shows offsets, models and settings.
 
 ## Supported

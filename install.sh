@@ -25,7 +25,7 @@ if ! "${HOME}/klippy-env/bin/python" -c "import cartographer" 2>/dev/null; then
 	echo "      RatOS Setup Wizard (see GUIDE.md). Klipper shows an error about [cartographer] until then."
 fi
 
-echo "==> Linking Klipper extra trsync_timeout.py"
+echo "==> Linking optional Klipper extra trsync_timeout.py (off unless [trsync_timeout] is in printer.cfg)"
 ln -sf "${HERE}/klippy/trsync_timeout.py" "${KLIPPER_DIR}/klippy/extras/trsync_timeout.py"
 
 echo "==> Generating ${RATOS_CFG}/z-probe/cartographer.cfg"
