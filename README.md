@@ -167,6 +167,7 @@ Paste in printer.cfg
 | Klipper still won't start after step 4 | Check that `[safe_z_home]` / `[homing_override]` are not in printer.cfg, and with CAN that `serial` / `restart_method` are removed. Then in the terminal run `python3 ~/ratos-cartographer/build.py` and click **Restart** in Mainsail. |
 | `Nozzle temperature must be below 150C` | Let the nozzle cool down, or add `variable_cartographer_touch_true_zero_temp: 145` under `[gcode_macro RatOS]` in printer.cfg. |
 | `Communication timeout during homing` | See below. |
+| `mcu 'mcu': Unable to connect` or `Permission denied: '/dev/RatOS/...'` after running install.sh | Run `sudo udevadm trigger --action=add --subsystem-match=tty`, then `FIRMWARE_RESTART` in Mainsail. A reboot also fixes it. |
 | Something else | Open an issue on GitHub with the error, the output of `CARTOGRAPHER_RATOS_STATUS` and your `klippy.log`. |
 
 ### Communication timeout during homing
