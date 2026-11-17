@@ -37,7 +37,7 @@ sed "s#@RATOS_SCRIPTS@#${RATOS_CFG}/scripts#" "${HERE}/99-cartographer.rules.in"
 sudo install -m 644 /tmp/99-cartographer.rules /etc/udev/rules.d/99-cartographer.rules
 rm -f /tmp/99-cartographer.rules
 sudo udevadm control --reload-rules
-sudo udevadm trigger --subsystem-match=tty
+sudo udevadm trigger --action=add --subsystem-match=tty
 # 2. Rebuild cartographer.cfg every time Klipper starts, so RatOS updates are picked up automatically.
 #    The leading '-' means a failed build never stops Klipper; the previous cartographer.cfg is kept.
 #    The same run also disables the [probe] section the RatOS configurator generates for Cartographer.
